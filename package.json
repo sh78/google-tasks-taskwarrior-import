@@ -1,0 +1,29 @@
+{
+  "name": "google-tasks-to-taskwarrior",
+  "version": "0.0.1",
+  "description": "Import tasks from a Google Takeout of Google Tasks (JSON) into Taskwarrior (CLI).",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sh78/google-tasks-to-task-warrior.git"
+  },
+  "keywords": [
+    "google",
+    "tasks",
+    "taskwarrior",
+    "export",
+    "import",
+    "takeout",
+    "backup",
+    "json"
+  ],
+  "author": "Sean Henderson",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/sh78/google-tasks-to-task-warrior/issues"
+  },
+  "homepage": "https://github.com/sh78/google-tasks-to-task-warrior#readme"
+}
