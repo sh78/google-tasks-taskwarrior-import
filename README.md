@@ -31,6 +31,7 @@ Reads a JSON export from [Google Takeout] of [Google Tasks] and runs
 ## What It Might Do Later
 
 - [ ] Use [chalk] for nice output
+- [ ] Annotate every task with the original JSON
 - [ ] Support due dates
 - [ ] Handle adding indented tasks from Google as blocking tasks in Taskwarrior
 - [ ] Deal with tasks that are linked to Gmail messages
