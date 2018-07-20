@@ -30,6 +30,7 @@ Reads a JSON export from [Google Takeout] of [Google Tasks] and runs
 
 ## What It Might Do Later
 
+- [ ] Use [chalk] for nice output
 - [ ] Support due dates
 - [ ] Handle adding indented tasks from Google as blocking tasks in Taskwarrior
 - [ ] Deal with tasks that are linked to Gmail messages
@@ -39,6 +40,9 @@ Reads a JSON export from [Google Takeout] of [Google Tasks] and runs
 
     npm install -g google-tasks-taskwarrior-import
     google-tasks-taskwarrior-import ~/path/to/Tasks.json
+    # profit
+
+![](https://media.giphy.com/media/eoxomXXVL2S0E/giphy.gif)
 
 ## Troubleshooting
 
@@ -46,7 +50,7 @@ There isn't much error handling, due to budget concerns for the current fiscal.
 If an import exits with errors, you can likely run `task +googleTasks delete` to
 destroy all imported tasks and try again after debugging.
 
-## Resources
+
 
 [Google Takeout]: https://takeout.google.com/
 [Google Tasks]: https://gsuite.google.com/learning-center/products/apps/keep-track-of-tasks/
@@ -54,3 +58,4 @@ destroy all imported tasks and try again after debugging.
 [Taskwarrior Annotations]: https://taskwarrior.org/docs/terminology.html#annotation
 [Taskwarrior Dependencies]: https://randomgeekery.org/2018/02/19/setting-task-dependencies-in-taskwarrior/
 [Taskwarrior Modify]: https://taskwarrior.org/docs/commands/modify.html
+[chalk]: https://github.com/chalk/chalk
