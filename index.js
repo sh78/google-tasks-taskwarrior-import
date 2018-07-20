@@ -40,7 +40,7 @@ function flattenTaskLists (input) {
  * @param {object} task - object with values for passing to `task`
  * @returns {string}
  */
-function makeTaskAdd (task) {
+function taskAdd (task) {
   let taskCommand
   let taskAction
   if (task.status === 'needsAction') {
@@ -117,7 +117,7 @@ for (let list in lists) {
       let subtaskIDs = []
       if (subtasks.length) {
         subtasks.forEach(subtask => {
-          const taskAddCommand = makeTaskAdd({
+          const taskAddCommand = taskAdd({
             title: subtask.title,
             status: subtask.status,
             project: list,
@@ -135,7 +135,7 @@ for (let list in lists) {
       }
 
       if (!task.parent) {
-        const taskAddCommand = makeTaskAdd({
+        const taskAddCommand = taskAdd({
           title: task.title,
           status: task.status,
           project: list,
