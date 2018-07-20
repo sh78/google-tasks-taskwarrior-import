@@ -1,25 +1,23 @@
 const fs = require('fs')
-const { exec } = require('child_process')
+const execSync = require('child_process').execSync
 
 const args = process.argv
 const googleTasks = JSON.parse(fs.readFileSync(args[2], 'utf8'))
 
+/**
+ * Run a shell command synchronously
+ *
+ * @param {string} command - shell command to run
+ * @returns {string} - stdio/err
+ */
 function runCommand (command) {
-  let output = ''
-  exec(command, (err, stdout, stderr) => {
-    if (err) {
-      throw err
-    }
-    console.log(`STDOUT: ${stdout}`)
-    output += stdout
-  })
-  return output
+  return execSync(command).toString()
 }
 
 /**
  * Flatten Google Tasks export object into an object with the
  * task list name as the key for an array of task objects.
- * @returns {Object}
+ * @returns {object}
  */
 function flattenTaskLists (input) {
   let taskListsArray = []
@@ -37,25 +35,57 @@ function flattenTaskLists (input) {
 
 /**
  * Make a `task add` command as a string.
- * @param {string} task
- * @param {string} project
- * @param {Array} tags
+ * @param {object} task - object with values for passing to `task`
  * @returns {string}
  */
-function makeTaskAdd (taskTitle, taskStatus, project, tags) {
+function makeTaskAdd (task) {
   let taskCommand
   let taskAction
-  if (taskStatus === 'needsAction') {
+  if (task.status === 'needsAction') {
     taskAction = 'add'
-  } else if (taskStatus === 'complete') {
+  } else if (task.status === 'complete') {
     taskAction = 'log'
   }
-  taskCommand = `task ${taskAction} "${taskTitle}" project:"${project}"`
-  tags = tags || []
+  taskCommand = `task ${taskAction} "${task.title}" project:"${task.project}"`
+  let tags = task.tags || []
   tags.forEach(function (tag) {
     taskCommand += ` +"${tag}"`
   })
-  return taskCommand
+  if (task.depends) taskCommand += ` depends:${task.depends}`
+  console.log(`Running command: ${taskCommand}`)
+  return runCommand(taskCommand)
+}
+
+/**
+ * Add annotation to a task already in taskwarrior
+ *
+ * @param {string|interger} taskID
+ * @param {string} annotation
+ * @returns {undefined}
+ */
+function annotateTask (taskID, annotation) {
+  let taskCommand = `task ${taskID} annotate "${annotation}"`
+  return runCommand(taskCommand)
+}
+
+/**
+ * extractTaskID
+ *
+ * @param {string} output - output of a `task add` command
+ * @returns {string} - ID of the task referenced in @output
+ */
+function extractTaskID (output) {
+  if (output) {
+    let re = /(Created task )([0-9]*)/
+    let match = output.match(re)
+    let taskshID
+    if (match && match.length > 2) {
+      taskshID = match[match.length - 1]
+    }
+    return taskshID || null
+  } else {
+    return null
+  }
 }
 
 /**
@@ -67,29 +97,55 @@ for (let list in lists) {
     lists.hasOwnProperty(list) &&
     typeof lists[list] === 'undefined'
   ) {
-    console.log(`Skipping empty list ${list}`)
+    console.log(`Skipping empty list "${list}"\n`)
   } else {
     const listName = list
     const tasks = lists[list]
-    console.log(listName, tasks.length)
+    console.log('Processing "' + listName + '" (' + tasks.length + ' tasks)...')
 
     tasks.forEach(function (task) {
-      const taskAddCommand = makeTaskAdd(
-        task.title,
-        task.status,
-        list,
-        ['googleTasks']
-      )
-      console.log(taskAddCommand)
+      const uuid = task.id
+      let subtasks = []
+      tasks.find(obj => {
+        if (obj.parent === uuid) subtasks.push(obj)
+      })
 
-      // TODO: run the task command and save the output
-      // const taskshOutput = runCommand('echo "Created task 277."')
+      let subtaskIDs = []
+      if (subtasks.length) {
+        subtasks.forEach(subtask => {
+          const taskAddCommand = makeTaskAdd({
+            title: subtask.title,
+            status: subtask.status,
+            project: list,
+            tags: ['googleTasks']
+          })
 
-      // TODO: catch task id from stdout and use it to annotate
-      // with a dump of the original object data
-      // re = /(?<=Created\ task\ )[0-9]*/
-      // const taskshID = taskshOutput.match(re)[0]
-      // console.log(taskshID)
+          let taskID = extractTaskID(taskAddCommand)
+          if (subtask.notes) {
+            const taskAnnotateCommand = annotateTask(taskID, subtask.notes)
+            console.log(taskAnnotateCommand)
+          }
+
+          subtaskIDs.push(taskID)
+        })
+      }
+
+      if (!task.parent) {
+        const taskAddCommand = makeTaskAdd({
+          title: task.title,
+          status: task.status,
+          project: list,
+          tags: ['googleTasks'],
+          depends: subtaskIDs
+        })
+        console.log(taskAddCommand)
+        let taskID = extractTaskID(taskAddCommand)
+
+        if (task.notes) {
+          const taskAnnotateCommand = annotateTask(taskID, task.notes)
+          console.log(taskAnnotateCommand)
+        }
+      }
     })
   }
 }

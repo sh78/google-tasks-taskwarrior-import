@@ -1,31 +1,53 @@
-# Import Google Tasks To Taskwarrior
+# Import From Google Tasks To Taskwarrior
 
 🚨 Danger Zone: This software is battle tested. We here at Import Google
 Tasks To Taskwarrior do hope it saves you some time and frustration, but please
-don't blindly run it against your production database (of tasks).
+don't blindly run it against your production database (of tasks). It has been
+used successfully on macOS 10.13.5 (17F77) with `node` v10.4.0 and `task` 2.5.1.
 
 ## What It Does
 
-Reads a JSON export from [Google Takeout](https://takeout.google.com/) of
-[Google Tasks](https://gsuite.google.com/learning-center/products/apps/keep-track-of-tasks/)
-data and outputs a list of [Taskwarrior](https://taskwarrior.org/)
-commands that can be run to import the tasks (the `task` cli command).
+Reads a JSON export from [Google Takeout] of [Google Tasks] and runs
+[Taskwarrior] shell commands (`task`) on your system to import the tasks.
 
-Each "list" from Google Tasks is added as the `project:` for the task in the
-Taskwarrior command.
-
-**Protip:** If your task lists in Google Tasks contain Emojis and such, best
-sanitize those out of your JSON payload first.
+- Each "list" from Google Tasks is added verbatim as the `project:` for the task
+  in the Taskwarrior command.
+  
+  **Protip:** If your task lists in Google Tasks contain Emojis and such, best
+  sanitize those out of your JSON payload first.
+- If a task contains notes (the text box below with extra details), they are
+  added as a single [annotation][Taskwarrior Annotations]
+- Subtasks for a Google Task are added as [dependencies][Taskwarrior
+  Dependencies] of their parent task using `depends:`.
+- All imported tasks are assigned a Taskwarrior tag "googleTasks"
+  (`+googleTasks`) to keep track of what was imported.
+  
+  **Protip:** If you want to further [modify tasks][Taskwarrior Modify] after
+  importing, run `task +googleTasks modify \[\[YOUR MODS\]\]` to do them all at
+  once.
 
 ## What It Might Do Later
 
-- [ ] Actually run the `task add` command and do the magic
-- [ ] Annotate each added task with a representation of a task's original JSON
 - [ ] Support due dates
 - [ ] Handle adding indented tasks from Google as blocking tasks in Taskwarrior
-    https://randomgeekery.org/2018/02/19/setting-task-dependencies-in-taskwarrior/
 - [ ] Deal with tasks that are linked to Gmail messages
 
 ## Usage
 
+    npm install google-tasks-taskwarrior-import
     node index.js sample_date/Tasks.json
+
+## Troubleshooting
+
+There isn't much error handling, due to budget concerns for the current fiscal.
+If an import exits with errors, you can likely run `task +googleTasks delete` to
+destroy all imported tasks and try again after debugging.
+
+## Resources
+
+[Google Takeout]: https://takeout.google.com/
+[Google Tasks]: https://gsuite.google.com/learning-center/products/apps/keep-track-of-tasks/
+[Taskwarrior]: https://taskwarrior.org/
+[Taskwarrior Annotations]: https://taskwarrior.org/docs/terminology.html#annotation
+[Taskwarrior Dependencies]: https://randomgeekery.org/2018/02/19/setting-task-dependencies-in-taskwarrior/
+[Taskwarrior Modify]: https://taskwarrior.org/docs/commands/modify.html
