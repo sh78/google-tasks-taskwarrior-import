@@ -23,19 +23,22 @@ Reads a JSON export from [Google Takeout] of [Google Tasks] and runs
   (`+googleTasks`) to keep track of what was imported.
   
   **Protip:** If you want to further [modify tasks][Taskwarrior Modify] after
-  importing, run `task +googleTasks modify \[\[YOUR MODS\]\]` to do them all at
+  importing, run `task +googleTasks modify [[YOUR MODS]]` to do them all at
   once.
+- Completed tasks from the Google export are still added, using the `task log`
+  command to mark them as done on arrival.
 
 ## What It Might Do Later
 
 - [ ] Support due dates
 - [ ] Handle adding indented tasks from Google as blocking tasks in Taskwarrior
 - [ ] Deal with tasks that are linked to Gmail messages
+- [ ] Have an option to pull directly from the Google Tasks API
 
 ## Usage
 
-    npm install google-tasks-taskwarrior-import
-    node index.js sample_date/Tasks.json
+    npm install -g google-tasks-taskwarrior-import
+    google-tasks-taskwarrior-import ~/path/to/Tasks.json
 
 ## Troubleshooting
 
