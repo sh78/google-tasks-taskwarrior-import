@@ -1,6 +1,6 @@
 {
   "name": "google-tasks-taskwarrior-import",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Import tasks from a Google Takeout of Google Tasks (JSON) into Taskwarrior (CLI).",
   "main": "index.js",
   "scripts": {
@@ -25,5 +25,8 @@
   "bugs": {
     "url": "https://github.com/sh78/google-tasks-taskwarrior-import/issues"
   },
-  "homepage": "https://github.com/sh78/google-tasks-taskwarrior-import#readme"
+  "homepage": "https://github.com/sh78/google-tasks-taskwarrior-import#readme",
+  "bin": {
+    "google-tasks-taskwarrior-import": "./index.js"
+  }
 }
