@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 const fs = require('fs')
 const execSync = require('child_process').execSync
 
@@ -43,7 +45,7 @@ function makeTaskAdd (task) {
   let taskAction
   if (task.status === 'needsAction') {
     taskAction = 'add'
-  } else if (task.status === 'complete') {
+  } else if (task.status === 'completed') {
     taskAction = 'log'
   }
   taskCommand = `task ${taskAction} "${task.title}" project:"${task.project}"`
@@ -64,8 +66,10 @@ function makeTaskAdd (task) {
  * @returns {undefined}
  */
 function annotateTask (taskID, annotation) {
-  let taskCommand = `task ${taskID} annotate "${annotation}"`
-  return runCommand(taskCommand)
+  if (taskID) {
+    let taskCommand = `task ${taskID} annotate "${annotation}"`
+    return runCommand(taskCommand)
+  }
 }
 
 /**
@@ -121,12 +125,12 @@ for (let list in lists) {
           })
 
           let taskID = extractTaskID(taskAddCommand)
-          if (subtask.notes) {
+          if (subtask.notes && taskID) {
             const taskAnnotateCommand = annotateTask(taskID, subtask.notes)
             console.log(taskAnnotateCommand)
           }
 
-          subtaskIDs.push(taskID)
+          if (taskID) subtaskIDs.push(taskID)
         })
       }
 
